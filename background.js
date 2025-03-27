@@ -1,12 +1,18 @@
-import * as time from "./time"
+function getCurrentTimeString() {
+    let now = new Date();
+    let hours = now.getHours().toString().padStart(2, '0');
+    let minutes = now.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+}
 
-// Function to update the badge with the current time
+// update the badge with the current time
+// https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge() {
-    let timeString = time.getCurrentTimeString();
+    let timeString = getCurrentTimeString();
     chrome.action.setBadgeText({ text: timeString });
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
 }
 
-// Initial update and set interval to refresh every minute
+// Initial update and set interval to refresh every second
 updateBadge();
-setInterval(updateBadge, 60000);
+let badgeInterval = setInterval(updateBadge, 1000);

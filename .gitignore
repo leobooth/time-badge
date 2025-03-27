@@ -1,1 +1,4 @@
 .idea
+
+# don't save the primary key for your Chrome extension
+.pem
