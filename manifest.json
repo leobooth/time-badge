@@ -7,6 +7,6 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "DisplayTime"
+    "default_title": "TimeBadge"
   }
 }

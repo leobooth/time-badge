@@ -1,1 +1,1 @@
-# display-time-chrome-extension
+# TimeBadge
