@@ -1,4 +1,4 @@
 .idea
 
-# don't save the primary key for your Chrome extension
+# ensure the primary key for your Chrome extension does not upload to GitHub
 .pem
