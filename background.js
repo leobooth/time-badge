@@ -30,7 +30,7 @@ function getCurrentTimeString(is24Hour, isAMPMVisible) {
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge() {
-    let badgeTime = getCurrentTimeString(false, false);
+    let badgeTime = getCurrentTimeString(true, false);
     let titleTime = getCurrentTimeString(false, true);
     chrome.action.setBadgeText({ text: badgeTime });
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
