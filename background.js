@@ -9,8 +9,16 @@ function getCurrentTimeString(is24Hour, isAMPMVisible) {
         hours = now.getHours().toString();
         ampm = "";
     } else {
-        hours = (now.getHours() % 12).toString();
-        ampm = now.getHours() < 12 ? "am" : "pm";
+        const hours24 = now.getHours();
+
+        // could be 12:00 or 00:00
+        if (hours24 % 12 === 0) {
+            hours = "12"
+        } else {
+            hours = (hours24 % 12).toString();
+        }
+
+        ampm = hours24 < 12 ? "am" : "pm";
     }
 
     hours = hours.padStart(2, '0');
@@ -31,12 +39,20 @@ function getCurrentTimeString(is24Hour, isAMPMVisible) {
 // https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge() {
     let badgeTime = getCurrentTimeString(true, false);
-    let titleTime = getCurrentTimeString(false, true);
     chrome.action.setBadgeText({ text: badgeTime });
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
+}
+
+function updateTitle() {
+    let titleTime = getCurrentTimeString(false, true);
     chrome.action.setTitle({title: titleTime})
 }
 
+function updateTime() {
+    updateBadge();
+    updateTitle();
+}
+
 // Initial update and set interval to refresh every second
-updateBadge();
-let badgeInterval = setInterval(updateBadge, 1000);
+updateTime()
+let badgeInterval = setInterval(updateTime, 1000);
