@@ -43,6 +43,7 @@ function updateBadge() {
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
 }
 
+// update the  with the current time
 function updateTitle() {
     let titleTime = getCurrentTimeString(false, true);
     chrome.action.setTitle({title: titleTime})
@@ -53,6 +54,27 @@ function updateTime() {
     updateTitle();
 }
 
-// Initial update and set interval to refresh every second
-updateTime()
-let badgeInterval = setInterval(updateTime, 1000);
+// Perform an initial update and set interval to refresh every second
+updateTime();
+let badgeIntervalId = setInterval(updateTime, 1000);
+
+// Detect when the user becomes active after being idle
+chrome.idle.setDetectionInterval(15);
+chrome.idle.onStateChanged.addListener(function(newState) {
+    if (badgeIntervalId > 0) {
+        clearInterval(badgeIntervalId);
+        console.log("cleared badgeIntervalId");
+    }
+
+    if (newState === "active") {
+        badgeIntervalId = setInterval(updateTime, 1000);
+        console.log("set badgeIntervalId: " + badgeIntervalId);
+        console.log("updated time after user activity")
+    }
+});
+
+// Ensure time badge updates when Chrome starts
+chrome.runtime.onStartup.addListener(() => {
+   updateTime();
+   console.log("updated time after Chrome start");
+});

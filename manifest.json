@@ -1,12 +1,15 @@
 {
   "name": "TimeBadge",
   "description": "Displays the current time as a Chrome Extension badge.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_title": "TimeBadge"
-  }
+  },
+  "permissions": [
+    "idle"
+  ]
 }
