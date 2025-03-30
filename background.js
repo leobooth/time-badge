@@ -4,6 +4,7 @@ function getCurrentTimeString(is24Hour, isAMPMVisible) {
     let minutes = "";
     let ampm = "";
     let currentTimeString = "";
+    let previousSystemState = "";
 
     if (is24Hour) {
         hours = now.getHours().toString();
@@ -60,16 +61,15 @@ let badgeIntervalId = setInterval(updateTime, 1000);
 
 // Detect when the user becomes active after being idle
 chrome.idle.setDetectionInterval(15);
-chrome.idle.onStateChanged.addListener(function(newState) {
-    if (badgeIntervalId > 0) {
-        clearInterval(badgeIntervalId);
-        console.log("cleared badgeIntervalId");
-    }
-
-    if (newState === "active") {
+chrome.idle.onStateChanged.addListener(function(newSystemState) {
+    // console.log("current time: " + getCurrentTimeString(true, false) + "; " +
+    // "current system state: " + newSystemState);
+    if (newSystemState === "active") {
         badgeIntervalId = setInterval(updateTime, 1000);
-        console.log("set badgeIntervalId: " + badgeIntervalId);
-        console.log("updated time after user activity")
+    } else if (newSystemState === "locked") {
+        clearInterval(badgeIntervalId);
+    } else if (newSystemState === "idle") {
+        // do nothing
     }
 });
 
