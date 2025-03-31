@@ -1,5 +1,17 @@
 let gbl_options = {}
-gbl_options.is24HourFormat = false;
+let badgeIntervalId = -1;
+
+// store options, initiate clock, and start timer when extension is installed
+chrome.runtime.onInstalled.addListener( () => {
+    gbl_options.is24HourFormat = false;
+    setOptionsToStorage(gbl_options).then();
+    console.log("stored options upon install:");
+    console.log(gbl_options);
+
+    // Perform an initial update and set interval to refresh every second
+    updateTime();
+    badgeIntervalId = setInterval(updateTime, 1000);
+});
 
 function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
     let now = new Date();
@@ -9,6 +21,7 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
     let currentTimeString = "";
     let hours24 = 0;
 
+    // 24-hour format does not show "am" or "pm"
     if (is24HourFormat) {
         hours = now.getHours().toString();
         ampm = "";
@@ -19,6 +32,7 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
         currentTimeString = `${hours}:${minutes}`;
     }
 
+    // 12-hour format may show "am" or "pm" depending on display location
     if (!is24HourFormat) {
         hours24 = now.getHours();
 
@@ -37,7 +51,6 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
         } else {
             // due to display space restrictions,
             // don't show 'a' or 'p' after double-digit hours
-
             if (hours.length < 2) {
                 ampm = hours24 < 12 ? "a" : "p";
             } else {
@@ -53,6 +66,7 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge(options) {
+    // if 12-hour format is chosen, do not show "am" or "pm" in the badge, only "a" or "p"
     let badgeTime = getCurrentTimeString(options.is24HourFormat, false);
     chrome.action.setBadgeText({ text: badgeTime });
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
@@ -60,6 +74,7 @@ function updateBadge(options) {
 
 // update the on-hover title with the current time
 function updateTitle(options) {
+    // if 12-hour format is chosen, show "am" or "pm" in the title
     let titleTime = getCurrentTimeString(!options.is24HourFormat, true);
     chrome.action.setTitle({title: titleTime})
 }
@@ -90,11 +105,6 @@ chrome.action.onClicked.addListener(async () => {
     console.log("options from storage:");
     console.log(options);
 
-    if (options === undefined) {
-        const options = {};
-        options.is24HourFormat = gbl_options.is24HourFormat;
-    }
-
     gbl_options.is24HourFormat = !options.is24HourFormat;
 
     console.log("gbl_options after toggle:");
@@ -103,14 +113,6 @@ chrome.action.onClicked.addListener(async () => {
     await setOptionsToStorage(gbl_options);
     updateTime();
 });
-
-
-// Perform an initial update and set interval to refresh every second
-console.log("initial gbl_options");
-console.log(gbl_options);
-setOptionsToStorage(gbl_options).then();
-updateTime();
-let badgeIntervalId = setInterval(updateTime, 1000);
 
 // Detect when the user becomes active after being idle
 chrome.idle.setDetectionInterval(15);
@@ -124,9 +126,9 @@ chrome.idle.onStateChanged.addListener(function(newSystemState) {
     }
 });
 
-// Ensure time badge updates when Chrome starts
+// Ensure time badge updates when profile having this extension starts
 chrome.runtime.onStartup.addListener(() => {
-    console.log("got options after startup");
+    console.log("got options after profile startup");
     gbl_options = getOptionsFromStorage();
     updateTime();
 });
