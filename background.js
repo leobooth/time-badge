@@ -3,6 +3,7 @@ let badgeIntervalId = -1;
 
 // store options, initiate clock, and start timer when extension is installed
 chrome.runtime.onInstalled.addListener( () => {
+    // TODO: get stored options from Chrome sync first. if there are none (how to detect?), then store initial options
     gbl_options.is24HourFormat = false;
     setOptionsToStorage(gbl_options).then();
     console.log("stored options upon install:");
@@ -62,6 +63,8 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
 
     return currentTimeString;
 }
+
+// TODO: change colors based on dark mode setting (or if Chrome skin background is dark or light)
 
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
