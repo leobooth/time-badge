@@ -39,7 +39,8 @@ function getCurrentTimeString(is24HourFormat, isAMPMVisible, displayFullLengthTi
         } else {
             // due to display space restrictions,
             // don't show 'a' or 'p' after double-digit hours
-            if (hours24 % 12 < 10) {
+
+            if (hours.length < 2) {
                 ampm = hours24 < 12 ? "a" : "p";
             } else {
                 ampm = "";
