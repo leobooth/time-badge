@@ -63,8 +63,14 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
 
     return currentTimeString;
 }
+// TODO: Alternate display ideas (user would toggle through them to choose one)
+//     * change colors based on dark mode setting (or if Chrome skin background is dark or light)
+//     * change icon behind badge to sun or moon so that am/pm status is implied
+//     * display digital time in the icon display area as an HTML canvas (larger font?)
 
-// TODO: change colors based on dark mode setting (or if Chrome skin background is dark or light)
+// TODO: change on-hover display to today's date instead of alternate time display
+//       but how would one handle alternate date formats (mm/dd/yyyy, dd/mm/yyyy, etc)
+//       * does the time from JS also provide the date format preferred by the user on their system?
 
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
