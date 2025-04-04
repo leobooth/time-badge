@@ -68,10 +68,6 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
 //     * change icon behind badge to sun or moon so that am/pm status is implied
 //     * display digital time in the icon display area as an HTML canvas (larger font?)
 
-// TODO: change on-hover display to today's date instead of alternate time display
-//       but how would one handle alternate date formats (mm/dd/yyyy, dd/mm/yyyy, etc)
-//       * does the time from JS also provide the date format preferred by the user on their system?
-
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge(options) {
@@ -80,6 +76,10 @@ function updateBadge(options) {
     chrome.action.setBadgeText({ text: badgeTime });
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
 }
+
+// TODO: change on-hover display to today's date instead of alternate time display
+//       but how would one handle alternate date formats (mm/dd/yyyy, dd/mm/yyyy, etc)
+//       * does the time from JS also provide the date format preferred by the user on their system?
 
 // update the on-hover title with the current time
 function updateTitle(options) {
@@ -124,6 +124,7 @@ chrome.action.onClicked.addListener(async () => {
 });
 
 // Detect when the user becomes active after being idle
+// TODO: get stored options from Chrome sync before updating time
 chrome.idle.setDetectionInterval(15);
 chrome.idle.onStateChanged.addListener(function(newSystemState) {
     if (newSystemState === "active") {
@@ -134,6 +135,9 @@ chrome.idle.onStateChanged.addListener(function(newSystemState) {
         // do nothing
     }
 });
+
+// TODO: ensure service worker restarts after Chrome restarts
+//       for example, Chrome crashed and the service worker was inactive
 
 // Ensure time badge updates when profile having this extension starts
 chrome.runtime.onStartup.addListener(() => {
