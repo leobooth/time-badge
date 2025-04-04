@@ -139,6 +139,8 @@ chrome.idle.onStateChanged.addListener(function(newSystemState) {
 // TODO: ensure service worker restarts after Chrome restarts
 //       for example, Chrome crashed and the service worker was inactive
 
+// TODO: ensure clock restarts after toggling the extension off and on in Extensions tab
+
 // Ensure time badge updates when profile having this extension starts
 chrome.runtime.onStartup.addListener(() => {
     console.log("got options after profile startup");
