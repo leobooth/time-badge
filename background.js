@@ -63,6 +63,37 @@ function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
 
     return currentTimeString;
 }
+
+function getCurrentDateTimeFormattedString(dateOrTime) {
+    let now = new Date();
+    
+    const dateOptions = {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+    }
+    
+    const timeOptions = {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric"
+    }
+
+    const dateFormatter = new Intl.DateTimeFormat(undefined, dateOptions);
+    const timeFormatter = new Intl.DateTimeFormat(undefined, timeOptions);
+
+    const formattedDate = dateFormatter.format(now);
+    const formattedTime = timeFormatter.format(now);
+
+    if (dateOrTime.toString().toLowerCase().trim() === "date") {
+        return formattedDate;
+    } else if (dateOrTime.toString().toLowerCase().trim() === "time") {
+        return formattedTime;
+    } else {
+        throw new Error("getCurrentDateTimeFormatttedString() argument must be 'date' or 'time'");
+    }
+}
+
 // TODO: Alternate display ideas (user would toggle through them to choose one)
 //     * change colors based on dark mode setting (or if Chrome skin background is dark or light)
 //     * change icon behind badge to sun or moon so that am/pm status is implied
@@ -82,17 +113,23 @@ function updateBadge(options) {
 //       * does the time from JS also provide the date format preferred by the user on their system?
 
 // update the on-hover title with the current time
-function updateTitle(options) {
+function updateTitleWithTime(options) {
     // if 12-hour format is chosen, show "am" or "pm" in the title
     let titleTime = getCurrentTimeString(!options.is24HourFormat, true);
     chrome.action.setTitle({title: titleTime})
+}
+
+// update the on-hover title with the current time
+function updateTitleWithDate() {
+    let titleDate = getCurrentDateTimeFormattedString("date");
+    chrome.action.setTitle({title: titleDate});
 }
 
 // if the badge shows 12-hour time, the title will show 24-hour time
 // and vice versa when the badge is toggled
 function updateTime() {
     updateBadge(gbl_options);
-    updateTitle(gbl_options);
+    updateTitleWithDate();
 }
 
 // get user preference for 12 or 24-hour time format

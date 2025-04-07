@@ -3,7 +3,7 @@ A simple extension that displays the current time.
 Pin the extension, and you will always be able to see the current time 
 in your browser window. That's it!
 
-Beta testing instructions:
+Beta testing instructions (until available from Chrome Web Store):
 
 To install:
 1. In the Chrome Extensions tab:
@@ -23,10 +23,13 @@ To install:
    4. Click "Select Folder"
 8. In the Chrome browser toolbar, click the Extensions "puzzle piece" icon
 9. Pin TimeBadge in your browser, so that you can always see the time on-screen
-10. TimeBadge should display the current time in 12-hour format.
-11. If you hover over the extension icon, it should display 24-hour time in a "title" tooltip.
-10. Click the extension to toggle between 12-hour and 24-hour time.
-    1. The extension should remember your settings:
-       2. If you lock the computer and reopen it (after at least 20 seconds)
-       3. If you shut down and restart your computer
+
+Testing instructions:
+1. TimeBadge should display the current time in 12-hour format by default.
+2. If you hover over the extension icon, it should display the current date in a "title" tooltip.
+   1. The date should appear in the same format as the system date on your computer.
+3. Click the extension to toggle between 12-hour and 24-hour time.
+4. The extension should remember your settings:
+   1. If you lock the computer and reopen it (after at least 20 seconds)
+   2. If you shut down and restart your computer
   
