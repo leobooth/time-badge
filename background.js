@@ -2,16 +2,19 @@ let gbl_options = {}
 let badgeIntervalId = -1;
 
 // store options, initiate clock, and start timer when extension is installed
-chrome.runtime.onInstalled.addListener( () => {
-    // TODO: get stored options from Chrome sync first. if there are none (how to detect?), then store initial options
-    gbl_options.is24HourFormat = false;
-    setOptionsToStorage(gbl_options).then();
-    console.log("stored options upon install:");
-    console.log(gbl_options);
-
-    // Perform an initial update and set interval to refresh every second
-    updateTime();
-    badgeIntervalId = setInterval(updateTime, 1000);
+chrome.runtime.onInstalled.addListener(async () => {
+    console.log("onInstalled: initializing time badge");
+    
+    // Ensure initial default options are stored on first install
+    const storedOptions = await getOptionsFromStorage();
+    if (!storedOptions || storedOptions.is24HourFormat === undefined) {
+        const defaultOptions = { is24HourFormat: false };
+        await setOptionsToStorage(defaultOptions);
+        console.log("stored initial default options:", defaultOptions);
+    }
+    
+    // Initialize the badge
+    await initializeTimeBadge();
 });
 
 function getCurrentTimeString(is24HourFormat, displayFullLengthTime) {
@@ -108,10 +111,6 @@ function updateBadge(options) {
     chrome.action.setBadgeBackgroundColor({ color: "#000000" });
 }
 
-// TODO: change on-hover display to today's date instead of alternate time display
-//       but how would one handle alternate date formats (mm/dd/yyyy, dd/mm/yyyy, etc)
-//       * does the time from JS also provide the date format preferred by the user on their system?
-
 // update the on-hover title with the current time
 function updateTitleWithTime(options) {
     // if 12-hour format is chosen, show "am" or "pm" in the title
@@ -161,26 +160,49 @@ chrome.action.onClicked.addListener(async () => {
 });
 
 // Detect when the user becomes active after being idle
-// TODO: get stored options from Chrome sync before updating time
 chrome.idle.setDetectionInterval(15);
-chrome.idle.onStateChanged.addListener(function(newSystemState) {
+chrome.idle.onStateChanged.addListener(async function(newSystemState) {
     if (newSystemState === "active") {
-        badgeIntervalId = setInterval(updateTime, 1000);
-    } else if (newSystemState === "locked") {
+        // Get stored options from Chrome sync before updating time
+        const storedOptions = await getOptionsFromStorage();
+        if (storedOptions) {
+            gbl_options = storedOptions;
+        }
+        
+        // Clear any existing interval before creating a new one
         clearInterval(badgeIntervalId);
-    } else if (newSystemState === "idle") {
-        // do nothing
+        badgeIntervalId = setInterval(updateTime, 1000);
+    } else if (newSystemState === "locked" || newSystemState === "idle") {
+        clearInterval(badgeIntervalId);
     }
 });
 
-// TODO: ensure service worker restarts after Chrome restarts
-//       for example, Chrome crashed and the service worker was inactive
-
-// TODO: ensure clock restarts after toggling the extension off and on in Extensions tab
+// Ensure service worker restarts after Chrome restarts
+// This handles the case where Chrome crashed and the service worker was inactive
+async function initializeTimeBadge() {
+    // Clear any existing interval
+    clearInterval(badgeIntervalId);
+    
+    // Load options from storage
+    const storedOptions = await getOptionsFromStorage();
+    if (storedOptions) {
+        gbl_options = storedOptions;
+    } else {
+        // Fallback to defaults if no options exist
+        gbl_options.is24HourFormat = false;
+    }
+    
+    // Perform an initial update and start the interval
+    updateTime();
+    badgeIntervalId = setInterval(updateTime, 1000);
+}
 
 // Ensure time badge updates when profile having this extension starts
-chrome.runtime.onStartup.addListener(() => {
-    console.log("got options after profile startup");
-    gbl_options = getOptionsFromStorage();
-    updateTime();
+chrome.runtime.onStartup.addListener(async () => {
+    console.log("onStartup: initializing time badge");
+    await initializeTimeBadge();
 });
+
+// Initialize when service worker starts (covers cases where service worker restarts without onInstalled/onStartup)
+console.log("Service worker initialized");
+initializeTimeBadge();
