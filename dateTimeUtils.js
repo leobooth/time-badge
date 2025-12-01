@@ -29,11 +29,11 @@ export function getCurrentTimeString(is24HourFormat) {
         }
 
         // due to display space restrictions,
-        // show 'a' or 'p' instead of 'am' or 'pm' after double-digit hours   
+        // do not show 'a' or 'p' after double-digit hours
         if (hours.length < 2) {
-            ampm = hours24 < 12 ? "am" : "pm";
-        } else {
             ampm = hours24 < 12 ? "a" : "p";
+        } else {
+            ampm = "";
         }
 
         minutes = now.getMinutes().toString().padStart(2, '0');

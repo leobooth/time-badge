@@ -8,11 +8,11 @@ let badgeIntervalId = -1;
 chrome.runtime.onInstalled.addListener(async () => {
         
     // Ensure initial default options are stored on first install
-    const storedOptions = await getOptionsFromStorage();
+    const storedOptions = await StorageUtils.getOptionsFromStorage();
     if (!storedOptions || storedOptions.is24HourFormat === undefined) {
         
         const defaultOptions = { is24HourFormat: false };
-        await setOptionsToStorage(defaultOptions);
+        await StorageUtils.setOptionsToStorage(defaultOptions);
         console.log("stored initial default options:", defaultOptions);
     }
     
