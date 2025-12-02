@@ -59,22 +59,6 @@ export function getCurrentDateInLocalFormat() {
     return formattedDate;
 }
 
-// TODO: show this in the title tooltip if a user toggles to it
-export function getCurrentTimeInLocalFormat() {
-    let now = new Date();
-    
-    const timeOptions = {
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric"
-    }
-
-    const timeFormatter = new Intl.DateTimeFormat(undefined, timeOptions);
-    const formattedTime = timeFormatter.format(now);
-
-    return formattedTime;
-}
-
 // update the on-hover title with the current time
 export function updateTitleWithTime() {
     let titleDate = getCurrentTimeInLocalFormat();
