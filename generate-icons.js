@@ -54,22 +54,33 @@ function createPNG(size, getPixel) {
 
 // ── Blue Sky ──────────────────────────────────────────────────────────────────
 
-function inCloud(x, y, size) {
-  if (size < 32) return false;
-  const s = size / 48;
-  const cx = size * 0.55, cy = size * 0.42;
-  const circles = [
-    [cx,           cy,           7 * s],
-    [cx - 6 * s,   cy + 3 * s,   5 * s],
-    [cx + 6 * s,   cy + 3 * s,   5 * s],
-    [cx - 2 * s,   cy + 5 * s,   5 * s],
-    [cx + 3 * s,   cy + 5 * s,   5 * s],
-  ];
-  return circles.some(([ox, oy, r]) => (x - ox) ** 2 + (y - oy) ** 2 <= r * r);
+function inSun(x, y, size) {
+  const cx = size / 2, cy = size / 2;
+  const bodyR = size / 4;
+  // const dx = x - cx, dy = y - cy;
+  // const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // if (dist <= bodyR) return true;
+
+  // // Rays for sizes where they're visible
+  // if (size >= 32) {
+  //   const rayOuter = bodyR + size / 10;
+  //   if (dist > bodyR && dist <= rayOuter) {
+  //     const angle = Math.atan2(dy, dx);
+  //     const step = Math.PI / 4; // 8 rays, 45° apart
+  //     for (let i = 0; i < 8; i++) {
+  //       let diff = Math.abs(angle - i * step);
+  //       if (diff > Math.PI) diff = 2 * Math.PI - diff;
+  //       if (diff <= Math.atan2(1.2, dist)) return true;
+  //     }
+  //   }
+  // }
+
+  return false;
 }
 
 function blueSky(x, y, size) {
-  if (inCloud(x, y, size)) return [255, 255, 255];
+  if (inSun(x, y, size)) return [255, 220, 30];
 
   // Sky gradient: deep blue (#2196F3) at top → pale blue (#BBDEFB) at bottom
   const t = y / (size - 1);
