@@ -28,7 +28,7 @@ Testing instructions:
 1. TimeBadge should display the current time in 12-hour format by default.
 2. If you hover over the extension icon, it should display the current date in a "title" tooltip.
    1. The date should appear in the same format as the system date on your computer.
-3. Click the extension to toggle between 12-hour and 24-hour time.
+3. Click the extension to toggle between 12-hour, 24-hour time, light mode, and dark mode.
 4. The extension should remember your settings:
    1. If you lock the computer and reopen it (after at least 20 seconds)
    2. If you shut down and restart your computer

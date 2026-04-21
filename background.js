@@ -9,9 +9,16 @@ chrome.runtime.onInstalled.addListener(async () => {
         
     // Ensure initial default options are stored on first install
     const storedOptions = await StorageUtils.getOptionsFromStorage();
-    if (!storedOptions || storedOptions.is24HourFormat === undefined) {
+    if (!storedOptions || 
+        storedOptions.is24HourFormat === undefined || 
+        storedOptions.isDarkMode === undefined) {
         
-        const defaultOptions = { is24HourFormat: false };
+        const defaultOptions = {
+            optionSet: 1, 
+            is24HourFormat: false,
+            isDarkMode: false
+        };
+
         await StorageUtils.setOptionsToStorage(defaultOptions);
         console.log("stored initial default options:", defaultOptions);
     }
@@ -19,18 +26,38 @@ chrome.runtime.onInstalled.addListener(async () => {
     await initializeTimeBadge();
 });
 
-// TODO: Alternate display ideas (user would toggle through them to choose one)
-//     * change colors based on dark mode setting (or if Chrome skin background is dark or light)
-//     * change icon behind badge to sun or moon so that am/pm status is implied
-//     * display digital time in the icon display area as an HTML canvas (larger font?)
-
 // update the badge with the current time
 // https://developer.chrome.com/docs/extensions/reference/api/action
 function updateBadge(options) {
+
     // if 12-hour format is chosen, show "am" or "pm" in the badge
     let badgeTime = DateTimeUtils.getCurrentTimeString(options.is24HourFormat);
     chrome.action.setBadgeText({ text: badgeTime });
-    chrome.action.setBadgeBackgroundColor({ color: "#000000" });
+
+    if (!options.isDarkMode) {
+        chrome.action.setBadgeBackgroundColor({ color: "#FFFFFF" });
+        chrome.action.setBadgeTextColor({ color: "#000000" });
+        chrome.action.setIcon({ 
+            path: {
+             "16": "icons/light-mode/icon16.png", 
+             "32": "icons/light-mode/icon32.png", 
+             "48": "icons/light-mode/icon48.png", 
+             "128": "icons/light-mode/icon128.png"
+            } 
+        });
+    } else {
+        chrome.action.setBadgeBackgroundColor({ color: "#000000" });
+        chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
+        chrome.action.setIcon({ 
+            path: {
+             "16": "icons/dark-mode/icon16.png", 
+             "32": "icons/dark-mode/icon32.png", 
+             "48": "icons/dark-mode/icon48.png", 
+             "128": "icons/dark-mode/icon128.png"
+            } 
+        });
+    }
+
 }
 
 // if the badge shows 12-hour time, the title will show 24-hour time
@@ -48,7 +75,29 @@ chrome.action.onClicked.addListener(async () => {
     console.log("options from storage:");
     console.log(options);
 
-    gbl_options.is24HourFormat = !options.is24HourFormat;
+    let optionSet = options.optionSet;
+
+    if (optionSet == 1) {
+        options.isDarkMode = false;
+        options.is24HourFormat = false;
+    } else if (optionSet == 2) {
+        options.isDarkMode = false;
+        options.is24HourFormat = true;
+    } else if (optionSet == 3) {
+        options.isDarkMode = true;
+        options.is24HourFormat = false;
+    } else if (optionSet == 4) {
+        options.isDarkMode = true;
+        options.is24HourFormat = true;
+    }
+
+    if (optionSet == 4) {
+        options.optionSet = 1;
+    } else {
+        options.optionSet++;
+    }
+
+    gbl_options = options;
 
     console.log("gbl_options after toggle:");
     console.log(gbl_options);
@@ -89,6 +138,8 @@ async function initializeTimeBadge() {
         gbl_options = storedOptions;
     } else {
         // Fallback to defaults if no options exist
+        gbl_options.optionSet = 1;
+        gbl_options.isDarkMode = false;
         gbl_options.is24HourFormat = false;
     }
     
